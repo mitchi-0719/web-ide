@@ -1,4 +1,4 @@
-# Nand2Tetris ハードウェア自主ゼミ
+# Nand2Tetris 院ゼミ後半用リポジトリ
 
 基本ゲートから Hack Computer までを HDL で組み立て、自分で書いた Hack アセンブリを動かす。加算回路は、機能をテストで確認した上で NAND 数と最大論理段数を比較する。
 
@@ -16,14 +16,14 @@ Java、ブラウザの起動、グローバルインストールは不要。依�
 
 ## ゼミで使うファイル
 
-| 回 | 公式教材 | ファイル・主題 |
-| --- | --- | --- |
-| 1 | [Project 1](https://www.nand2tetris.org/project01) | `And`、`Xor`、`Mux` |
-| 2 | [Project 2](https://www.nand2tetris.org/project02) | `HalfAdder`、`FullAdder`、`Add16`、`ALU` |
-| 3 | [Project 3](https://www.nand2tetris.org/project03) | `Bit`、`Register`、`PC` |
-| 4 | [Project 4](https://www.nand2tetris.org/project04)、[Project 6](https://www.nand2tetris.org/project06) | Hack ASM と既存アセンブラの利用 |
-| 5 | [Project 5](https://www.nand2tetris.org/project05) | `CPU.hdl` |
-| 6 | [Project 5](https://www.nand2tetris.org/project05) | `Computer.hdl` とプログラムの実行 |
+| 回  | 公式教材                                                                                               | ファイル・主題                           |
+| --- | ------------------------------------------------------------------------------------------------------ | ---------------------------------------- |
+| 1   | [Project 1](https://www.nand2tetris.org/project01)                                                     | `And`、`Xor`、`Mux`                      |
+| 2   | [Project 2](https://www.nand2tetris.org/project02)                                                     | `HalfAdder`、`FullAdder`、`Add16`、`ALU` |
+| 3   | [Project 3](https://www.nand2tetris.org/project03)                                                     | `Bit`、`Register`、`PC`                  |
+| 4   | [Project 4](https://www.nand2tetris.org/project04)、[Project 6](https://www.nand2tetris.org/project06) | Hack ASM と既存アセンブラの利用          |
+| 5   | [Project 5](https://www.nand2tetris.org/project05)                                                     | `CPU.hdl`                                |
+| 6   | [Project 5](https://www.nand2tetris.org/project05)                                                     | `Computer.hdl` とプログラムの実行        |
 
 `seminar/hardware/` に対象の公式 HDL スターターとテストを置いている。自作した部品は同じフォルダから読み込まれる。存在しない部品は、対応する組み込み部品があればそちらを使う。まだ作っていない部品を組み込みで代用する場合は、未完成の HDL をテスト対象と同じフォルダに置かず、必要なファイルだけを作業用フォルダにコピーする。DFF、ROM32K、Memory などは組み込みを利用できる。
 
