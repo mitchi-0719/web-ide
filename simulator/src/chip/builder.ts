@@ -38,12 +38,26 @@ export async function loadChip(
   name: string,
   dir?: string,
   fs?: FileSystem,
+  localAncestors?: ReadonlySet<string>,
 ): Promise<Result<Chip>> {
-  if (hasBuiltinChip(name) || fs === undefined) {
+  if (localAncestors?.has(name)) {
+    return Err(new Error(`Recursive HDL dependency: ${name}`));
+  }
+  if (fs === undefined || (!localAncestors && hasBuiltinChip(name))) {
     return await getBuiltinChip(name);
   }
+  let file: string;
   try {
-    const file = await fs.readFile(`${dir}/${name}.hdl`);
+    file = await fs.readFile(`${dir}/${name}.hdl`);
+  } catch (error) {
+    const missing =
+      error instanceof Error && "code" in error && error.code === "ENOENT";
+    if (localAncestors && missing && hasBuiltinChip(name)) {
+      return getBuiltinChip(name);
+    }
+    return Err(new Error(`Could not load chip ${name}.hdl`, { cause: error }));
+  }
+  try {
     const maybeParsedHDL = HDL.parse(file);
 
     let maybeChip: Result<Chip, Error>;
@@ -53,6 +67,7 @@ export async function loadChip(
         dir,
         name,
         fs,
+        localAncestors,
       });
       if (isErr(maybeBuilt)) {
         maybeChip = Err(new Error(Err(maybeBuilt).message));
@@ -179,6 +194,7 @@ class ChipBuilder {
   private fs?: FileSystem;
   private dir?: string;
   private expectedName?: string;
+  private localAncestors?: ReadonlySet<string>;
 
   private chip: Chip;
   private internalPins: Map<string, InternalPin> = new Map();
@@ -191,6 +207,7 @@ class ChipBuilder {
     fs?: FileSystem;
     dir?: string;
     name?: string;
+    localAncestors?: ReadonlySet<string>;
   }) {
     return new ChipBuilder(options).build();
   }
@@ -200,16 +217,20 @@ class ChipBuilder {
     fs,
     dir,
     name,
+    localAncestors,
   }: {
     parts: HdlParse;
     fs?: FileSystem;
     dir?: string;
     name?: string;
+    localAncestors?: ReadonlySet<string>;
   }) {
     this.parts = parts;
     this.expectedName = name;
     this.dir = dir;
     this.fs = fs;
+    this.localAncestors =
+      localAncestors && new Set([...localAncestors, parts.name.value]);
     this.chip = new Chip(
       parts.ins.map(({ pin, width }) => ({ pin: pin.toString(), width })),
       parts.outs.map(({ pin, width }) => ({ pin: pin.toString(), width })),
@@ -253,9 +274,19 @@ class ChipBuilder {
     }
 
     for (const part of this.parts.parts) {
-      const builtin = await loadChip(part.name, this.dir, this.fs);
+      const builtin = await loadChip(
+        part.name,
+        this.dir,
+        this.fs,
+        this.localAncestors,
+      );
       if (isErr(builtin)) {
-        return Err(createError(`Undefined chip name: ${part.name}`, part.span));
+        return Err(
+          createError(
+            `Could not use chip ${part.name}: ${Err(builtin).message}`,
+            part.span,
+          ),
+        );
       }
       const partChip = Ok(builtin);
       if (partChip.name == this.chip.name) {

@@ -1,0 +1,35 @@
+#!/bin/sh
+set -eu
+
+cd "$(dirname "$0")"
+
+case "${1:-help}" in
+  help|-h|--help)
+    cat <<'EOF'
+使い方（例）
+  ./check setup         初回セットアップ（依存関係の取得・ビルド・動作確認）
+  ./check And           And.hdl を公式テストで確認
+  ./check cpu Add       Add.asm を CPU シミュレータで確認
+  ./check assemble Add  Add.asm を Add.hack に変換
+  ./check computer Add  Add.asm を自作 Computer.hdl で確認
+  ./check verify        ゼミ用ツールをビルドして動作確認
+EOF
+    exit 0
+    ;;
+  setup)
+    npm ci
+    exec npm run seminar:verify
+    ;;
+  verify)
+    exec npm run seminar:verify
+    ;;
+  cpu|assemble|computer|hdl) ;;
+  *) set -- hdl "$@" ;;
+esac
+
+if [ ! -d simulator/build ] || [ ! -d node_modules ]; then
+  echo '初回は ./check setup を実行してください。' >&2
+  exit 1
+fi
+
+exec node seminar/tool.mjs "$@"

@@ -37,7 +37,14 @@
     "web": "npm run start -w web",
     "start": "npm run web",
     "preinstall-cli": "npm run build -w projects && npm run build -w runner && npm run build -w simulator && npm run build -w cli",
-    "install-cli": "npm i -g cli"
+    "install-cli": "npm i -g cli",
+    "seminar:build": "npm run build -w projects && npm run build -w runner && npm run build -w simulator",
+    "seminar:test": "node seminar/tool.mjs hdl",
+    "seminar:assemble": "node seminar/tool.mjs assemble",
+    "seminar:smoke": "node --test seminar/smoke.test.mjs",
+    "seminar:verify": "npm run seminar:build && npm run seminar:smoke",
+    "seminar:cpu": "node seminar/tool.mjs cpu",
+    "seminar:computer": "node seminar/tool.mjs computer"
   },
   "workspaces": [
     "cli",
@@ -67,5 +74,8 @@
   "overrides": {
     "react": "^19.3.1",
     "react-dom": "^19.3.1"
+  },
+  "volta": {
+    "node": "24.16.0"
   }
 }
