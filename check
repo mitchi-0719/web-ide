@@ -9,6 +9,9 @@ case "${1:-help}" in
 使い方（例）
   ./check setup         初回セットアップ（依存関係の取得・ビルド・動作確認）
   ./check And           And.hdl を公式テストで確認
+  ./check And --isolated    依存部品に組み込み実装を使用
+  ./check And --integrated  自作の依存部品を優先し、読み込み元を表示
+  ./check lesson 1       第1回の課題を一括確認（1〜6、モード指定可）
   ./check cpu Add       Add.asm を CPU シミュレータで確認
   ./check assemble Add  Add.asm を Add.hack に変換
   ./check computer Add  Add.asm を自作 Computer.hdl で確認
@@ -23,7 +26,7 @@ EOF
   verify)
     exec npm run seminar:verify
     ;;
-  cpu|assemble|computer|hdl) ;;
+  cpu|assemble|computer|hdl|lesson) ;;
   *) set -- hdl "$@" ;;
 esac
 
